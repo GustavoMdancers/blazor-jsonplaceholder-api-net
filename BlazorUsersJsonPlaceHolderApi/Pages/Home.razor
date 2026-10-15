@@ -1,0 +1,68 @@
+﻿@page "/"
+@using BlazorUsersJsonPlaceHolderApi.Models
+@inject HttpClient Http
+
+<PageTitle>Primeiro usuário - JSONPlaceholder</PageTitle>
+
+<h1>Primeiro usuário retornado pela API</h1>
+
+@if (erro is not null)
+{
+    <p style="color:red">@erro</p>
+}
+else if (primeiro is null)
+{
+    <p>Carregando...</p>
+}
+else
+{
+    <h4>Dados pessoais</h4>
+    <p><strong>ID:</strong> @primeiro.Id</p>
+    <p><strong>Nome:</strong> @primeiro.Name</p>
+    <p><strong>Username:</strong> @primeiro.Username</p>
+    <p><strong>E-mail:</strong> @primeiro.Email</p>
+    <p><strong>Telefone:</strong> @primeiro.Phone</p>
+    <p><strong>Website:</strong> @primeiro.Website</p>
+
+    <h4>Endereço</h4>
+    <p><strong>Rua:</strong> @primeiro.Address.Street</p>
+    <p><strong>Suíte:</strong> @primeiro.Address.Suite</p>
+    <p><strong>Cidade:</strong> @primeiro.Address.City</p>
+    <p><strong>CEP:</strong> @primeiro.Address.Zipcode</p>
+    <p><strong>Latitude:</strong> @primeiro.Address.Geo.Lat</p>
+    <p><strong>Longitude:</strong> @primeiro.Address.Geo.Lng</p>
+
+    <h4>Empresa</h4>
+    <p><strong>Nome:</strong> @primeiro.Company.Name</p>
+    <p><strong>Slogan:</strong> @primeiro.Company.CatchPhrase</p>
+    <p><strong>BS:</strong> @primeiro.Company.Bs</p>
+}
+
+@code {
+    private User? primeiro;
+    private string? erro;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var users = await Http.GetFromJsonAsync<List<User>>(
+                "https://jsonplaceholder.typicode.com/users");
+
+            primeiro = users?.FirstOrDefault();
+
+            if (primeiro is not null)
+            {
+                // Item (b): console do navegador (F12)
+                Console.WriteLine($"Nome: {primeiro.Name}");
+                Console.WriteLine($"Cidade: {primeiro.Address.City}");
+                Console.WriteLine($"Empresa: {primeiro.Company.Name}");
+            }
+        }
+        catch (Exception ex)
+        {
+            erro = $"Erro ao consumir a API: {ex.Message}";
+            Console.WriteLine(erro);
+        }
+    }
+}
